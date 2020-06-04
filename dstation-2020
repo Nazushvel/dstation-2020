@@ -1,0 +1,211 @@
+#!/bin/bash
+
+# variables for changes
+downloader="aria2c"
+
+if [[ $1 == "setup" ]]; then
+
+    # checks for all tools needed for install
+    function checks(){
+	if [ -f "/bin/aria2c" ] || [ -f "/usr/bin/aria2c" ]; then
+	    downloader="aria2c"
+	elif [ -f "/bin/wget" ]; then
+	    downloader="wget"
+	else
+	    echo "install wget or aria2c"
+	    exit 1
+	fi
+
+	if [ -f "/bin/cpio" ] || [ -f "/usr/bin/cpio" ]; then
+	    echo "cpio installed"
+	else
+	    echo "This requires cpio to be installed, please install it for your system"
+	    exit 1
+	fi
+
+	if [ -f "/bin/7z" ] || [ -f "/usr/bin/7z" ]; then
+	    echo "7z installed"
+	else
+	    echo "This requires 7z to be installed, please install it for your system"
+	    exit 1
+	fi
+
+	if [ -f "/bin/zstd" ] || [ -f "/usr/bin/zstd" ]; then
+	    echo "zstd installed"
+	else
+	    echo "This requires zstd to be installed, please install it for your system"
+	    exit 1
+	fi
+    }
+
+    # Extracts all files in the dockingstation_195_64 file
+    function extractor(){
+	$downloader "http://www.webpetz.com/creatures/filez/ds_game/dockingstation_195_64.tar.bz2"
+	tar -xf dockingstation_195_64.tar.bz2 -C .
+	mv dockingstation_195_64/* .
+	rm -r dockingstation_195_64 dockingstation_195_64.tar.bz2
+	find . -type f -name '*.bz2' > $PWD/.files
+	input=$PWD/.files
+	while IFS= read -r line; do
+	    bunzip2 "$line"
+	    echo $line
+	done < $PWD/.files
+    }
+
+    # grabs all needed libs needed for running and replaced SDL with a working lib    
+    function libdown(){
+	if [[ $(lsb_release -is) == "Arch" ]]; then
+	    $downloader "http://rpmfind.net/linux/fedora/linux/releases/32/Everything/x86_64/os/Packages/g/gtk+-1.2.10-93.fc32.i686.rpm"
+	    7z x gtk+-1.2.10-93.fc32.i686.rpm
+	    zstd -d gtk+-1.2.10-93.fc32.i686.cpio.zstd -o gtk.cpio
+	    cpio -idv < gtk.cpio
+	elif [[ $(lsb_release -is) == "Ubuntu" ]] || [[ $(lsb_release -is) == "Debian" ]]; then
+	    $downloader "https://download-ib01.fedoraproject.org/pub/epel/6/x86_64/Packages/g/gtk+-1.2.10-70.el6.i686.rpm"
+	    7z x gtk+-1.2.10-70.el6.i686.rpm
+	    cpio -idv < gtk+-1.2.10-70.el6.i686.cpio
+	fi
+	$downloader "https://rpmfind.net/linux/fedora/linux/releases/32/Everything/x86_64/os/Packages/g/glib-1.2.10-58.fc32.i686.rpm"
+	$downloader "https://www.libsdl.org/release/SDL-1.2.9-1.i386.rpm"
+	7z x glib-1.2.10-58.fc32.i686.rpm
+	7z x SDL-1.2.9-1.i386.rpm
+	zstd -d glib-1.2.10-58.fc32.i686.cpio.zstd -o glib.cpio
+	cpio -idv < glib.cpio
+	cpio -idv < SDL-1.2.9-1.i386.cpio
+	rm gtk+-1.2.10-93.fc32.i686.cpio.zstd gtk+-1.2.10-93.fc32.i686.rpm glib-1.2.10-58.fc32.i686.cpio.zstd glib.cpio gtk.cpio glib-1.2.10-58.fc32.i686.rpm usr/lib/libgthread* SDL-1.2.9-1.i386.cpio SDL-1.2.9-1.i386.rpm gtk+-1.2.10-70.el6.i686
+	mv ports/linux_x86_glibc21_64/lc2e .
+	mv ports/linux_x86_glibc21_64/lc2elib.so .
+	mv ports/linux_x86_glibc21_64/lc2e-netbabel.so .
+	mv ports/linux_x86_glibc21_64/libSDL_mixer-1.2.so.0 .
+	mv ports/linux_x86_glibc21_64/libSDLStretch.so .
+	mv ports/linux_x86_glibc21_64/libstdc++-libc6.1-2.so.3 .
+	mv usr/lib/* .
+	rm -r usr/ etc/
+    }
+
+    # installs dockingstation
+    function installdock(){
+	mv "dsbuild 195/global" ./dockingstation
+	mv dockingstation/user.cfg .
+	rm -r "dsbuild 195"
+	sed -i -e "s/\"Default Munge\" DS_music.mng/\"Default Munge\" ds_music.mng/g" user.cfg
+	cd dockingstation/Images
+	for f in *; do mv "$f" "$f.tmp"; mv "$f.tmp" "`echo $f | tr "[:upper:]" "[:lower:]"`"; done
+	cd ../Backgrounds
+	for f in *; do mv "$f" "$f.tmp"; mv "$f.tmp" "`echo $f | tr "[:upper:]" "[:lower:]"`"; done
+	cd ../Sounds
+	for f in *; do mv "$f" "$f.tmp"; mv "$f.tmp" "`echo $f | tr "[:upper:]" "[:lower:]"`"; done
+	cd "../Overlay Data"
+	for f in *; do mv "$f" "$f.tmp"; mv "$f.tmp" "`echo $f | tr "[:upper:]" "[:lower:]"`"; done
+	cd ../..
+	$downloader "http://www.creaturesdockingstation.com/DSOfflineOption.zip"
+	7z x DSOfflineOption.zip
+	mv offlinelogin.c16 dockingstation/Images
+	mv zzz_gamestart_login.cos "dockingstation/Bootstrap/010 Docking Station"
+	rm DSOfflineOption.zip
+}
+
+    # makes directories for creatures3 as well as folders for mods
+    function mkdirs(){
+	mkdir "creatures3"
+	mkdir "mods"
+	mkdir "mods/Backgrounds"
+	mkdir "mods/Body Data"
+	mkdir "mods/Bootstrap"
+	ln -s "$PWD/creatures3/Bootstrap/001 World" "$PWD/mods/Bootstrap"
+	ln -s "$PWD/dockingstation/Bootstrap/010 Docking Station" "$PWD/mods/Bootstrap/"
+	mkdir "mods/Catalogue"
+	mkdir "mods/Creatures Galleries"
+	mkdir "mods/My Creatures"
+	mkdir "mods/Genetics"
+	mkdir "mods/Images"
+	mkdir "mods/Journal"
+	mkdir "mods/Overlay Data"
+	mkdir "mods/My Agents"
+	mkdir "mods/Sounds"
+	mkdir "mods/Users"
+	mkdir "mods/My Worlds"
+}
+
+    # generates machine.cfg
+    function machine(){
+	echo "\"Auxiliary 1 Backgrounds Directory\" \"./creatures3/Backgrounds/\"" > machine.cfg
+	echo "\"Auxiliary 1 Body Data Directory\" \"./creatures3/Body Data/\"" >> machine.cfg
+	echo "\"Auxiliary 1 Bootstrap Directory\" \"./creatures3/Bootstrap/\"" >> machine.cfg
+	echo "\"Auxiliary 1 Catalogue Directory\" \"./creatures3/Catalogue/\"" >> machine.cfg
+	echo "\"Auxiliary 1 Creature Database Directory\" \"./creatures3/Creature Galleries/\"" >> machine.cfg
+	echo "\"Auxiliary 1 Exported Creatures Directory\" \"./creatures3/My Creatures/\"" >> machine.cfg
+	echo "\"Auxiliary 1 Genetics Directory\" \"./creatures3/Genetics/\"" >> machine.cfg
+	echo "\"Auxiliary 1 Images Directory\" \"./creatures3/Images/\"" >> machine.cfg
+	echo "\"Auxiliary 1 Journal Directory\" \"./creatures3/Journal/\"" >> machine.cfg
+	echo "\"Auxiliary 1 Main Directory\" \"./creatures3/\"" >> machine.cfg
+	echo "\"Auxiliary 1 Overlay Data Directory\" \"./creatures3/Overlay Data/\"" >> machine.cfg
+	echo "\"Auxiliary 1 Resource Files Directory\" \"./creatures3/My Agents/\"" >> machine.cfg
+	echo "\"Auxiliary 1 Sounds Directory\" \"./creatures3/Sounds/\"" >> machine.cfg
+	echo "\"Auxiliary 1 Users Directory\" \"./creatures3/Users/\"" >> machine.cfg
+	echo "\"Auxiliary 1 Worlds Directory\" \"./creatures3/My Worlds/\"" >> machine.cfg
+	echo "\"Auxiliary 2 Backgrounds Directory\" \"./mods/Backgrounds/\"" >> machine.cfg
+	echo "\"Auxiliary 2 Body Data Directory\" \"./mods/Body Data/\"" >> machine.cfg
+	echo "\"Auxiliary 2 Bootstrap Directory\" \"./mods/Bootstrap/\"" >> machine.cfg
+	echo "\"Auxiliary 2 Catalogue Directory\" \"./mods/Catalogue/\"" >> machine.cfg
+	echo "\"Auxiliary 2 Creature Database Directory\" \"./mods/Creature Galleries/\"" >> machine.cfg
+	echo "\"Auxiliary 2 Exported Creatures Directory\" \"./mods/My Creatures/\"" >> machine.cfg
+	echo "\"Auxiliary 2 Genetics Directory\" \"./mods/Genetics/\"" >> machine.cfg
+	echo "\"Auxiliary 2 Images Directory\" \"./mods/Images/\"" >> machine.cfg
+	echo "\"Auxiliary 2 Journal Directory\" \"./mods/Journal/\"" >> machine.cfg
+	echo "\"Auxiliary 2 Main Directory\" \"./mods/\"" >> machine.cfg
+	echo "\"Auxiliary 2 Overlay Data Directory\" \"./mods/Overlay Data/\"" >> machine.cfg
+	echo "\"Auxiliary 2 Resource Files Directory\" \"./mods/My Agents/\"" >> machine.cfg
+	echo "\"Auxiliary 2 Sounds Directory\" \"./mods/Sounds/\"" >> machine.cfg
+	echo "\"Auxiliary 2 Users Directory\" \"./mods/Users/\"" >> machine.cfg
+	echo "\"Auxiliary 2 Worlds Directory\" \"./mods/My Worlds/\"" >> machine.cfg
+	echo "\"Backgrounds Directory\" \"./dockingstation/Backgrounds/\"" >> machine.cfg
+	echo "\"Body Data Directory\" \"./dockingstation/Body Data/\"" >> machine.cfg
+	echo "\"Bootstrap Directory\" \"./dockingstation/Bootstrap/\"" >> machine.cfg
+	echo "\"Catalogue Directory\" \"./dockingstation/Catalogue/\"" >> machine.cfg
+	echo "\"Creature Database Directory\" \"./dockingstation/Creature Galleries/\"" >> machine.cfg
+	echo "\"Exported Creatures Directory\" \"./dockingstation/My Creatures/\"" >> machine.cfg
+	echo "\"Genetics Directory\" \"./dockingstation/Genetics/\"" >> machine.cfg
+	echo "\"Images Directory\" \"./dockingstation/Images/\"" >> machine.cfg
+	echo "\"Journal Directory\" \"./dockingstation/Journal/\"" >> machine.cfg
+	echo "\"Main Directory\" \"./dockingstation/\"" >> machine.cfg
+	echo "\"Overlay Data Directory\" \"./dockingstation/Overlay Data/\"" >> machine.cfg
+	echo "\"Resource Files Directory\" \"./dockingstation/My Agents/\"" >> machine.cfg
+	echo "\"Sounds Directory\" \"./dockingstation/Sounds/\"" >> machine.cfg
+	echo "\"Users Directory\" \"./dockingstation/Users/\"" >> machine.cfg
+	echo "\"Worlds Directory\" \"./dockingstation/My Worlds/\"" >> machine.cfg
+	echo "\"Game Name\" \"Docking Station\"" >> machine.cfg
+	echo "\"Main Auxiliary\" 0" >> machine.cfg
+	echo "\"Win32 Auxiliary Game Name 1\" \"Creatures 3\"" >> machine.cfg
+
+}
+
+    # removes unneeded files
+    function cleanup(){
+	rm -r cdtastic dsbuild.bz2.txt ReadMe.txt ports
+}
+
+checks
+extractor
+libdown
+installdock
+mkdirs
+machine
+cleanup
+
+fi
+
+if [[ $1 == "start" ]]; then
+   export LD_LIBRARY_PATH="$PWD:$LD_LIBRARY_PATH" 
+   ./lc2e --autokill
+fi
+
+if [[ $1 == $NULL ]]; then
+    echo "Use/Modify this as needed"
+    echo "run ./dstation-2020 setup to install in this directory"
+    echo "after installing put all creatures 3 files in the creatures3 directory (not required)"
+    echo "mod files go into the mods folder (the bootstraps are linked to the creatures3 & dockingstation bootstrap)"
+    echo "to start run ./dstation-2020 start"
+    echo "if you have sound issue run speaker-test"
+    echo "if you do not hear sound in the test go follow this doc"
+    echo "https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture/Troubleshooting#Random_lack_of_sound_on_startup"
+fi
