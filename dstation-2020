@@ -9,7 +9,7 @@ if [[ $1 == "setup" ]]; then
     function checks(){
 	if [ -f "/bin/aria2c" ] || [ -f "/usr/bin/aria2c" ]; then
 	    downloader="aria2c"
-	elif [ -f "/bin/wget" ]; then
+	elif [ -f "/bin/wget" ] || [ -f "/usr/bin/wget" ]; then
 	    downloader="wget"
 	else
 	    echo "install wget or aria2c"
