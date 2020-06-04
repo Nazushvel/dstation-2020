@@ -40,8 +40,12 @@ if [[ $1 == "setup" ]]; then
 
     # Extracts all files in the dockingstation_195_64 file
     function extractor(){
-	$downloader "http://www.webpetz.com/creatures/filez/ds_game/dockingstation_195_64.tar.bz2"
-	tar -xf dockingstation_195_64.tar.bz2 -C .
+    	if [ -f "./dockingstation_195_64.tar.bz2" ]; then
+		tar -xf dockingstation_195_64.tar.bz2 -C .
+	else
+		$downloader "https://web.archive.org/web/20200604103518/http://www.webpetz.com/creatures/filez/ds_game/dockingstation_195_64.tar.bz2"
+		tar -xf dockingstation_195_64.tar.bz2 -C .
+	fi
 	mv dockingstation_195_64/* .
 	rm -r dockingstation_195_64 dockingstation_195_64.tar.bz2
 	find . -type f -name '*.bz2' > $PWD/.files
