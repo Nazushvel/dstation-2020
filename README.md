@@ -16,9 +16,9 @@ It installs hard to find library versions and creates a set of folders for the g
 5. Add any additional information you think might help
 
 ## How to use it
-Some distros (Arch 64, Ubuntu) are reported to run the script without any sort of setup beforehand. Others such as
-Debian may need you to do some setup work. See the **Pre-run Steps** section for information on what you need to install
-beforehand.
+Some distros (Arch 64) have been reported to run the script without any sort of setup beforehand. Others such as
+Ubuntu and Debian may need you to do some setup work before running the script. See the **Pre-run Steps** section for
+information on what you need to install beforehand.
 
 ### General requirements
 1. At least 75 mb of free space on the partition you're installing to
@@ -52,11 +52,18 @@ ready to help test solutions.
 This only lists distros that are known to have issues. Yours might work perfectly, or it might break. The only way to 
 find out is try!
 
-#### Debian 10 (Buster) 64 bit
+#### 64-Bit Debian & Ubuntu
+These instructions have been reported to work with the following distros:
+* Debian 10 Buster, 64 Bit
+* Ubuntu 20.04 LTS, 64 Bit
+
+They may also work for Mint and other similar distros.
 
 #### 1. Install the script's dependencies
 
-You'll need to install the `p7zip-full` and `zstd` packages. The others should come with Debian out of the box.
+You'll need to make sure that `p7zip-full` and `zstd` are installed as not all debian family OSes come with them:
+
+    sudo apt-get install p7zip-full zstd
 
 #### 1. Add i386 architecture, update apt, & restart
 Add the 386 architecture
@@ -71,8 +78,6 @@ If everything worked correctly, running `dpkg --print-foreign-architectures` sho
 
     vagrant@buster:~$ dpkg --print-foreign-architectures
     i386
-
-You may need to restart your system at this point.
 
 #### 2. Install additional dependencies
 
