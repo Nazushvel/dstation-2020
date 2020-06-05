@@ -47,12 +47,12 @@ then you need to enable compatibility for 32 bit binaries. If your distro isn't 
 ready to help test solutions.
 
 
-### Pre-run Steps
+## Pre-run Steps
 
 This only lists distros that are known to have issues. Yours might work perfectly, or it might break. The only way to 
 find out is try!
 
-#### 64-Bit Debian & Ubuntu
+### 64-Bit Debian & Ubuntu
 These instructions have been reported to work with the following distros:
 * Debian 10 Buster, 64 Bit
 * Ubuntu 20.04 LTS, 64 Bit
