@@ -24,7 +24,7 @@ information on what you need to install beforehand.
 1. At least 75 mb of free space on the partition you're installing to
 2. 32-bit compatibility enabled, see the the **Pre-run Steps** section
 
-### Running the script
+### Installing the game
 
 1. Put the script in a directory you'd like to install DS into. 
 2. Make sure the script is set to executable, either through your file manager's GUI,
