@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# This script is for testing the dstation-2020 script. It isn't
+# helpful for regular users who want to install Docking Station.
+
+if [[ -z `which python3` ]] ; then
+    echo "Python 3 is required to run the dummy server"
+else
+    # serve the local directory over port 8000
+    python3 -m http.server 8000
+fi
