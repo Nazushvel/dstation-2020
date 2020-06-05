@@ -65,7 +65,7 @@ You'll need to make sure that `p7zip-full` and `zstd` are installed as not all d
 
     sudo apt-get install p7zip-full zstd
 
-#### 1. Add i386 architecture, update apt, & restart
+#### 2. Add i386 architecture & update apt
 Add the 386 architecture
 
     sudo dpkg --add-arch i386
@@ -79,7 +79,7 @@ If everything worked correctly, running `dpkg --print-foreign-architectures` sho
     vagrant@buster:~$ dpkg --print-foreign-architectures
     i386
 
-#### 2. Install additional dependencies
+#### 3. Install additional dependencies
 
 These are needed for the game to run.
 
