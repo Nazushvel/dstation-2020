@@ -216,6 +216,15 @@ if [[ $1 == "start" ]]; then
    ./lc2e --autokill
 fi
 
+if [[ $1 == "lower" ]]; then
+    find ./creatures3  -type f -print0 | xargs -0n 1 bash -c \
+    's=$(dirname "$0")/$(basename "$0");
+    d=$(dirname "$0")/$(basename "$0"|tr "[A-Z]" "[a-z]"); mv -f "$s" "$d"'
+    find ./dockingstation  -type f -print0 | xargs -0n 1 bash -c \
+    's=$(dirname "$0")/$(basename "$0");
+    d=$(dirname "$0")/$(basename "$0"|tr "[A-Z]" "[a-z]"); mv -f "$s" "$d"'
+fi
+
 if [[ $1 == $NULL ]]; then
     echo "Use/Modify this as needed"
     echo "run ./dstation-2020 setup to install in this directory"
