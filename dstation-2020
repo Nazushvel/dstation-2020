@@ -72,7 +72,6 @@ if [[ $1 == "setup" ]]; then
 	    $downloader "https://rpmfind.net/linux/fedora/linux/releases/32/Everything/x86_64/os/Packages/g/glib-1.2.10-58.fc32.i686.rpm"
 	    $downloader "https://www.libsdl.org/release/SDL-1.2.9-1.i386.rpm"
 	    7z -y x "*.rpm"
-	    zstd -d gtk+-1.2.10-70.el6.i686.cpio.zstd -o gtk.cpio
 	    zstd -d glib-1.2.10-58.fc32.i686.cpio.zstd -o glib.cpio
 	    cpio -idv < SDL-1.2.9-1.i386.cpio
 	    cpio -idv < gtk.cpio
