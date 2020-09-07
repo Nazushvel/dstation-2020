@@ -9,7 +9,7 @@ if [[ $1 == "setup" ]]; then
 	elif [ -f "/bin/wget" ] || [ -f "/usr/bin/wget" ]; then
 	    downloader="wget"
 	else
-	    echo "This requires wget to be installed, please install it for your system"
+	    echo "This requires either wget or aria2c to be installed, please install it for your system"
 	    exit 1
 	fi
 
@@ -57,10 +57,16 @@ if [[ $1 == "setup" ]]; then
     function libdown(){
 	dis=$(lsb_release -is)
 	arch=$(uname -m)
-	if [[ $dis == "Arch" ]]; then
-	    $downloader -Z "http://rpmfind.net/linux/fedora/linux/releases/32/Everything/x86_64/os/Packages/g/gtk+-1.2.10-93.fc32.i686.rpm" \
-		"https://rpmfind.net/linux/fedora/linux/releases/32/Everything/x86_64/os/Packages/g/glib-1.2.10-58.fc32.i686.rpm" \
-		"https://www.libsdl.org/release/SDL-1.2.9-1.i386.rpm"
+	if [[ $dis == "Arch" ]] || [[ $dis == "Artix" ]]; then
+	    if [[ $downloader == "wget" ]]; then
+	    	$downloader "http://rpmfind.net/linux/fedora/linux/releases/32/Everything/x86_64/os/Packages/g/gtk+-1.2.10-93.fc32.i686.rpm" \
+			"https://rpmfind.net/linux/fedora/linux/releases/32/Everything/x86_64/os/Packages/g/glib-1.2.10-58.fc32.i686.rpm" \
+			"https://www.libsdl.org/release/SDL-1.2.9-1.i386.rpm"
+		elif [[ $downloader == "aria2c" ]]; then
+			$downloader -Z "http://rpmfind.net/linux/fedora/linux/releases/32/Everything/x86_64/os/Packages/g/gtk+-1.2.10-93.fc32.i686.rpm" \
+			"https://rpmfind.net/linux/fedora/linux/releases/32/Everything/x86_64/os/Packages/g/glib-1.2.10-58.fc32.i686.rpm" \
+			"https://www.libsdl.org/release/SDL-1.2.9-1.i386.rpm"
+		fi
 	    7z -y x "*.rpm"
 	    zstd -d gtk+-1.2.10-93.fc32.i686.cpio.zstd -o gtk.cpio
 	    zstd -d glib-1.2.10-58.fc32.i686.cpio.zstd -o glib.cpio
