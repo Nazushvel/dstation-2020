@@ -57,10 +57,10 @@ if [[ $1 == "setup" ]]; then
     function libdown(){
 	dis=$(lsb_release -is)
 	arch=$(uname -m)
-	if [[ $dis == "Arch" ]]; then
-	    $downloader -Z "http://rpmfind.net/linux/fedora/linux/releases/32/Everything/x86_64/os/Packages/g/gtk+-1.2.10-93.fc32.i686.rpm" \
-		"https://rpmfind.net/linux/fedora/linux/releases/32/Everything/x86_64/os/Packages/g/glib-1.2.10-58.fc32.i686.rpm" \
-		"https://www.libsdl.org/release/SDL-1.2.9-1.i386.rpm"
+	if [[ $dis == "Arch" ]] || [[ $dis == "Artix" ]]; then
+	    $downloader "http://rpmfind.net/linux/fedora/linux/releases/32/Everything/x86_64/os/Packages/g/gtk+-1.2.10-93.fc32.i686.rpm"
+	    $downloader "https://rpmfind.net/linux/fedora/linux/releases/32/Everything/x86_64/os/Packages/g/glib-1.2.10-58.fc32.i686.rpm"
+	    $downloader "https://www.libsdl.org/release/SDL-1.2.9-1.i386.rpm"
 	    7z -y x "*.rpm"
 	    zstd -d gtk+-1.2.10-93.fc32.i686.cpio.zstd -o gtk.cpio
 	    zstd -d glib-1.2.10-58.fc32.i686.cpio.zstd -o glib.cpio
@@ -68,9 +68,9 @@ if [[ $1 == "setup" ]]; then
 	    cpio -idv < glib.cpio
 	    cpio -idv < SDL-1.2.9-1.i386.cpio
 	elif [[ $dis == "Ubuntu" && $arch != "i386" ]] || [[ $dis == "Debian" ]]; then
-	    $downloader "https://download-ib01.fedoraproject.org/pub/epel/6/x86_64/Packages/g/gtk+-1.2.10-70.el6.i686.rpm" \
-		"https://rpmfind.net/linux/fedora/linux/releases/32/Everything/x86_64/os/Packages/g/glib-1.2.10-58.fc32.i686.rpm" \
-		"https://www.libsdl.org/release/SDL-1.2.9-1.i386.rpm"
+	    $downloader "https://download-ib01.fedoraproject.org/pub/epel/6/x86_64/Packages/g/gtk+-1.2.10-70.el6.i686.rpm"
+	    $downloader "https://rpmfind.net/linux/fedora/linux/releases/32/Everything/x86_64/os/Packages/g/glib-1.2.10-58.fc32.i686.rpm"
+	    $downloader "https://www.libsdl.org/release/SDL-1.2.9-1.i386.rpm"
 	    7z -y x "*.rpm"
 	    zstd -d gtk+-1.2.10-70.el6.i686.cpio.zstd -o gtk.cpio
 	    zstd -d glib-1.2.10-58.fc32.i686.cpio.zstd -o glib.cpio
@@ -78,9 +78,9 @@ if [[ $1 == "setup" ]]; then
 	    cpio -idv < gtk.cpio
 	    cpio -idv < glib.cpio
 	elif [[ $dis == "Ubuntu" && $arch == "i386" ]]; then
-	    $downloader "https://download-ib01.fedoraproject.org/pub/epel/6/x86_64/Packages/g/gtk+-1.2.10-70.el6.i686.rpm" \
-		"https://rpmfind.net/linux/fedora-secondary/releases/30/Everything/i386/os/Packages/g/glib-1.2.10-55.fc30.i686.rpm" \
-		"https://www.libsdl.org/release/SDL-1.2.9-1.i386.rpm"
+	    $downloader "https://download-ib01.fedoraproject.org/pub/epel/6/x86_64/Packages/g/gtk+-1.2.10-70.el6.i686.rpm" 
+	    $downloader "https://rpmfind.net/linux/fedora-secondary/releases/30/Everything/i386/os/Packages/g/glib-1.2.10-55.fc30.i686.rpm"
+	    $downloader "https://www.libsdl.org/release/SDL-1.2.9-1.i386.rpm"
 	    7z -y x "*.rpm"
 	    zstd -d gtk+-1.2.10-70.el6.i686.cpio.zstd -o gtk.cpio
 	    zstd -d glib-1.2.10-55.fc30.i686.cpio.zstd -o glib.cpio
