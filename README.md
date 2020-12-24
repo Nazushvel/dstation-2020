@@ -26,11 +26,18 @@ information on what you need to install beforehand.
 
 ### Installing the game
 
+#### Docking Station Only
+
 1. Put the script in a directory you'd like to install DS into. 
 2. Make sure the script is set to executable, either through your file manager's GUI,
  or by running `chmod +x dstation-2020`.
 3. Run `./dstation-2020 setup`
 
+#### DS/C3
+1. Put the script in a directory you'd like to install DS into.
+2. Make sure the script is set to executable, either through your file manager's GUI, or by running `chmod +x dstation-2020`.
+3. Put installer for C3 into the directory (Currently only GOG's installer is supported)
+4. Run `./dstation-2020 setup`
 
 ### Running the game
 If all went well with install, all you should need to do to run is:
