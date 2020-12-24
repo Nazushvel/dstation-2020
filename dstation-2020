@@ -120,9 +120,28 @@ if [[ $1 == "setup" ]]; then
 	rm DSOfflineOption.zip
 }
 
+# installs creatures 3
+    function installc3(){
+	if [[ -f "./setup_creatures_exodus_1.0_(20316).exe" ]]; then
+	    mkdir "creatures3"
+	    WINEPREFIX=$PWD/.wine wine "setup_creatures_exodus_1.0_(20316).exe"
+	    find "$PWD/.wine/drive_c/GOG Games/Creatures Exodus/Creatures 3" -maxdepth 1 -type f -exec rm -fv {} \;
+	    mv .wine/drive_c/GOG\ Games/Creatures\ Exodus/Creatures\ 3/* $PWD/creatures3/
+	    cd creatures3/Images
+	    for f in *; do mv "$f" "$f.tmp"; mv "$f.tmp" "`echo $f | tr "[:upper:]" "[:lower:]"`"; done
+	    cd ../Backgrounds
+	    for f in *; do mv "$f" "$f.tmp"; mv "$f.tmp" "`echo $f | tr "[:upper:]" "[:lower:]"`"; done
+	    cd ../Sounds
+	    for f in *; do mv "$f" "$f.tmp"; mv "$f.tmp" "`echo $f | tr "[:upper:]" "[:lower:]"`"; done
+	    cd "../Overlay Data"
+	    for f in *; do mv "$f" "$f.tmp"; mv "$f.tmp" "`echo $f | tr "[:upper:]" "[:lower:]"`"; done
+	    cd ../..
+	    rm -rf .wine
+	fi
+    }
+
     # makes directories for creatures3 as well as folders for mods
     function mkdirs(){
-	mkdir "creatures3"
 	mkdir "mods"
 	mkdir "mods/Backgrounds"
 	mkdir "mods/Body Data"
@@ -204,6 +223,7 @@ checks
 extractor
 libdown
 installdock
+installc3
 mkdirs
 machine
 cleanup
@@ -213,15 +233,6 @@ fi
 if [[ $1 == "start" ]]; then
    export LD_LIBRARY_PATH="$PWD:$LD_LIBRARY_PATH" 
    ./lc2e --autokill
-fi
-
-if [[ $1 == "lower" ]]; then
-    find ./creatures3  -type f -print0 | xargs -0n 1 bash -c \
-    's=$(dirname "$0")/$(basename "$0");
-    d=$(dirname "$0")/$(basename "$0"|tr "[A-Z]" "[a-z]"); mv -f "$s" "$d"'
-    find ./dockingstation  -type f -print0 | xargs -0n 1 bash -c \
-    's=$(dirname "$0")/$(basename "$0");
-    d=$(dirname "$0")/$(basename "$0"|tr "[A-Z]" "[a-z]"); mv -f "$s" "$d"'
 fi
 
 if [[ $1 == $NULL ]]; then
